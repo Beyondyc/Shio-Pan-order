@@ -1,0 +1,167 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shio Pan Daily Preorder</title>
+    <style>
+        :root {
+            --butter-gold: #f4c430;
+            --crust-brown: #8b5a2b;
+            --soft-cream: #faf7f2;
+            --dark-text: #2d2d2d;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--soft-cream);
+            color: var(--dark-text);
+            line-height: 1.6;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(139, 90, 43, 0.08);
+        }
+        h1 {
+            color: var(--crust-brown);
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--crust-brown);
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--butter-gold);
+        }
+        .limit-notice {
+            background-color: #fef3c7;
+            border-left: 4px solid var(--butter-gold);
+            padding: 12px;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            margin-bottom: 25px;
+        }
+        button {
+            width: 100%;
+            background-color: var(--crust-brown);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #734922;
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🥐 Fresh Shio Pan Preorder</h1>
+    <p class="subtitle">Salt butter rolls, baked fresh daily for local pickup.</p>
+    
+    <div class="limit-notice">
+        <strong>Daily Bakery Limit:</strong> We only bake 120 buns per day to ensure perfect structure and cavity formation. Slots fill up fast!
+    </div>
+
+    <form id="orderForm">
+        <!-- 1. Customer Basics -->
+        <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" required placeholder="Your name">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" required placeholder="name@example.com">
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" required placeholder="For pickup reminders">
+        </div>
+
+        <!-- 2. Order Details -->
+        <div class="form-group">
+            <label for="quantity">Quantity (Individual Buns)</label>
+            <select id="quantity" required>
+                <option value="2">2 Buns</option>
+                <option value="4">4 Buns</option>
+                <option value="6">6 Buns (Half Dozen)</option>
+                <option value="12">12 Buns (Full Dozen)</option>
+            </select>
+        </div>
+
+        <!-- 3. Local Pickup Selection -->
+        <div class="form-group">
+            <label for="pickupDate">Select Pickup Date</label>
+            <select id="pickupDate" required>
+                <!-- Dates will be dynamically updated by your inventory logic -->
+                <option value="saturday">Saturday Pickup (10:00 AM - 2:00 PM)</option>
+                <option value="sunday">Sunday Pickup (10:00 AM - 2:00 PM)</option>
+            </select>
+        </div>
+
+        <!-- 4. Payment Gateway Direct Trigger -->
+        <button type="submit">Proceed to Secure Payment</button>
+    </form>
+    
+    <p class="footer-note">Payments safely processed via Stripe. Local pickup only.</p>
+</div>
+
+<script>
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // This is where we grab the details to send to the payment gateway
+        const orderDetails = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            quantity: document.getElementById('quantity').value,
+            date: document.getElementById('pickupDate').value
+        };
+
+        alert(`Redirecting ${orderDetails.name} to Stripe to pay for ${orderDetails.quantity} Shio Pan rolls for ${orderDetails.date} pickup!`);
+        
+        // Next Step: Trigger Stripe Checkout session link here
+    });
+</script>
+
+</body>
+</html>
