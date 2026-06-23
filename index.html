@@ -16,24 +16,26 @@
         .qty-stepper { display: flex; align-items: center; justify-content: space-between; border: 1px solid #cbd5e1; border-radius: 20px; padding: 4px 12px; width: 100px; margin: 12px auto 0 auto; }
         .qty-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #333; }
         .form-group { margin-bottom: 15px; } label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; color: #8b5a2b; }
-        input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
         .radio-option { border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; }
         .btn { width: 100%; background: #8b5a2b; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         .btn:disabled { opacity: 0.5; }
         .qr-box { width: 180px; height: 180px; background: #eee; margin: 15px auto; display: flex; justify-content: center; align-items: center; border: 2px dashed #bbb; border-radius: 12px; }
-        .success-icon { font-size: 4rem; color: #4ade80; margin-bottom: 10px; }
+        .success-icon { font-size: 4rem; color: #4ade80; margin-bottom: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
+    <!-- STAGE 1: MENU -->
     <div id="page1" class="page active">
         <h2>Shio Pan Sets</h2>
         <div class="menu-grid" id="menu"></div>
-        <div style="text-align:right; margin-top:20px; font-weight:bold;">Total: <span id="p1-total">$0.00</span></div>
+        <div style="text-align:right; margin-top:20px; font-weight:bold; font-size:1.1rem;">Total: <span id="p1-total">$0.00</span></div>
         <button class="btn" onclick="goToPage(2)" id="nextBtn" disabled>Next: Checkout</button>
     </div>
 
+    <!-- STAGE 2: DETAILS -->
     <div id="page2" class="page">
         <h2>Checkout Details</h2>
         <form id="orderForm" onsubmit="handleFormSubmit(event)">
@@ -47,6 +49,7 @@
         </form>
     </div>
 
+    <!-- STAGE 3: PAYMENT -->
     <div id="page3" class="page" style="text-align:center;">
         <h2>Scan & Pay</h2>
         <div class="qr-box"><img src="tng-qr.png" alt="QR" style="width:100%"></div>
@@ -54,16 +57,16 @@
         <button id="completeOrderBtn" class="btn" disabled onclick="finalizeOrderAndLockSheet()">Verify & Complete</button>
     </div>
 
+    <!-- STAGE 4: CONFIRMATION -->
     <div id="page4" class="page" style="text-align:center;">
         <div class="success-icon">✓</div>
         <h2>Order Confirmed!</h2>
-        <p>Your order is logged. We'll be in touch via WhatsApp.</p>
+        <p>Thank you! Your order is logged.</p>
         <button class="btn" onclick="window.location.reload()">New Order</button>
     </div>
 </div>
 
 <script>
-    // --- PERSONALIZED CONFIGURATION ---
     const GOOGLE_FORM_ID = "1FAIpQLSdFHPNDMeSIzx29M3g41t-7h8RQWsYr1unWqorwVT7NP-y6Hg"; 
     const NAME_ENTRY   = "entry.752256232";
     const PHONE_ENTRY  = "entry.1480684134";
@@ -72,7 +75,12 @@
     const TOTAL_ENTRY  = "entry.1929353025";
     const METHOD_ENTRY = "entry.2053930896";
 
-    const menuItems = { choc: { name: "Au chocolat", price: 8.4 }, garlic: { name: "Garlic", price: 8.4 }, bacon: { name: "Bacon", price: 9.0 }, azuki: { name: "Azuki", price: 9.6 } };
+    const menuItems = { 
+        choc: { name: "Au chocolat", price: 8.40, emoji: "🍫" }, 
+        garlic: { name: "Garlic", price: 8.40, emoji: "🧄" },
+        bacon: { name: "Bacon", price: 9.00, emoji: "🥓" },
+        azuki: { name: "Azuki", price: 9.60, emoji: "🍡" }
+    };
     for (let k in menuItems) menuItems[k].qty = 0;
 
     let totalOrderPrice = 0, pendingOrderData = null;
@@ -97,7 +105,12 @@
 
     function handleFormSubmit(e) {
         e.preventDefault();
-        pendingOrderData = { name: document.getElementById('custName').value, phone: document.getElementById('custPhone').value, email: document.getElementById('custEmail').value, method: document.querySelector('input[name="delivery"]:checked').value };
+        pendingOrderData = { 
+            name: document.getElementById('custName').value, 
+            phone: document.getElementById('custPhone').value, 
+            email: document.getElementById('custEmail').value, 
+            method: document.querySelector('input[name="delivery"]:checked').value 
+        };
         goToPage(3);
     }
 
@@ -122,7 +135,15 @@
     }
 
     let menuHtml = "";
-    for(let k in menuItems) menuHtml += `<div class="menu-card">${menuItems[k].name}<div class="qty-stepper"><button class="qty-btn" onclick="changeQty('${k}',-1)">-</button><span id="qty-${k}">0</span><button class="qty-btn" onclick="changeQty('${k}',1)">+</button></div></div>`;
+    for(let k in menuItems) menuHtml += `<div class="menu-card">
+        <div style="font-size:1.5rem; text-align:center;">${menuItems[k].emoji}</div>
+        <div class="item-title">${menuItems[k].name}</div>
+        <div class="item-price">$${menuItems[k].price.toFixed(2)}</div>
+        <div class="qty-stepper">
+            <button class="qty-btn" onclick="changeQty('${k}',-1)">−</button>
+            <span id="qty-${k}">0</span>
+            <button class="qty-btn" onclick="changeQty('${k}',1)">+</button>
+        </div></div>`;
     document.getElementById('menu').innerHTML = menuHtml;
 </script>
 </body>
