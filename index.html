@@ -48,7 +48,7 @@
         .item-title { font-weight: bold; margin-top: 8px; font-size: 0.95rem; min-height: 44px; }
         .item-price { color: #666; font-size: 0.9rem; margin-top: 4px; font-weight: 600; }
 
-        /* Quantity Selector Styles */
+        /* Quantity Selector Styles matching image_d48786.png */
         .qty-stepper {
             display: flex;
             align-items: center;
@@ -72,7 +72,7 @@
         }
         .qty-val { font-weight: 600; font-size: 1rem; }
 
-        /* Page 2: Form Styles */
+        /* Form Controls */
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; color: #8b5a2b; }
         input, select {
@@ -84,12 +84,12 @@
         .radio-option input { width: auto; margin-right: 10px; margin-top: 3px; }
         .radio-details { font-size: 0.85rem; color: #555; }
         
-        /* Summary Box */
+        /* Summary Card */
         .summary-box { background: #f8fafc; border-radius: 8px; padding: 15px; margin-top: 20px; border: 1px dashed #cbd5e1; }
         .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; }
         .summary-total { font-weight: bold; font-size: 1.1rem; border-top: 1px solid #e2e8f0; padding-top: 8px; margin-top: 8px; }
 
-        /* Upload styling */
+        /* Dynamic Upload Frame */
         .upload-section {
             background: #f1f5f9;
             border: 2px dashed #cbd5e1;
@@ -98,7 +98,7 @@
             margin: 20px 0;
         }
 
-        /* General Buttons */
+        /* Buttons */
         .btn {
             width: 100%; background: #7e868c; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 20px;
         }
@@ -107,23 +107,17 @@
         .btn-success { background: #25D366; text-decoration: none; display: inline-block; box-sizing: border-box; }
         .btn-success:hover { background: #128C7E; }
 
-        /* Page 3: Payment Box */
         .qr-box {
             width: 180px; height: 180px; background: #eee; margin: 15px auto; display: flex; justify-content: center; align-items: center; border: 2px dashed #bbb; border-radius: 12px;
         }
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
-        
-        /* Success Badge */
-        .success-badge {
-            font-size: 4rem; color: #25D366; margin-bottom: 10px;
-        }
+        .success-badge { font-size: 4rem; color: #25D366; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     
-    <!-- PAGE 1: CHOOSE QUANTITIES -->
     <div id="page1" class="page active">
         <h2>Shio Pan Sets</h2>
         <p style="color:#666; font-size:0.9rem;">Adjust your desired quantity per bag package below.</p>
@@ -178,7 +172,6 @@
         <button class="btn btn-primary" onclick="goToPage(2)" id="nextBtn" disabled style="opacity:0.5;">Next: Checkout Details</button>
     </div>
 
-    <!-- PAGE 2: CHECKOUT DETAILS -->
     <div id="page2" class="page">
         <h2>Checkout Details</h2>
         
@@ -226,7 +219,6 @@
         </form>
     </div>
 
-    <!-- PAGE 3: PAYMENT & ATTACH RECEIPT (STRICT GATE) -->
     <div id="page3" class="page" style="text-align:center;">
         <h2>Scan & Pay</h2>
         <p id="paymentInstructions">Processing payment methods...</p>
@@ -244,7 +236,6 @@
         
         <p style="font-weight:bold; color:#c05621; font-size:1.2rem; margin:10px 0;">Total Balance: <span id="paymentTotalDue">$0.00</span></p>
         
-        <!-- REQUIRED FILE UPLOAD FIELD -->
         <div class="upload-section">
             <label style="text-align:left; color:#333;">Upload Payment Transaction Slip *</label>
             <p style="font-size:0.8rem; color:#666; margin:4px 0 10px 0; text-align:left;">You must attach your screenshot/receipt photo to unlock the next step.</p>
@@ -259,7 +250,6 @@
         </div>
     </div>
 
-    <!-- PAGE 4: CONFIRMED SCREEN (GOOGLE SHEET SENDS HERE) -->
     <div id="page4" class="page" style="text-align:center; padding:20px 0;">
         <div class="success-badge">✓</div>
         <h2>Order Confirmed!</h2>
@@ -276,16 +266,16 @@
 </div>
 
 <script>
+    // LIVE CONFIGURATION FOR BUTTER TOWN DATA BRIDGE
     const MY_PHONE_NUMBER = "60123456789"; 
+    const GOOGLE_FORM_ID = "1mTkZ-MDoZ5-2EQTkqPDmgDxcrrHGfaYYvz8c34B3yX0";
     
-    // GOOGLE FORM ENTRY ATTRIBUTES
-    const GOOGLE_FORM_ID = "YOUR_GOOGLE_FORM_ID_HERE";
-    const NAME_ENTRY = "entry.111111111";
-    const PHONE_ENTRY = "entry.222222222";
-    const EMAIL_ENTRY = "entry.333333333";
-    const BASKET_ENTRY = "entry.444444444";
-    const TOTAL_ENTRY = "entry.555555555";
-    const METHOD_ENTRY = "entry.666666666";
+    const NAME_ENTRY = "entry.311357675";
+    const PHONE_ENTRY = "entry.607421381";
+    const EMAIL_ENTRY = "entry.1691288301";
+    const BASKET_ENTRY = "entry.1030064716";
+    const TOTAL_ENTRY = "entry.835471922";
+    const METHOD_ENTRY = "entry.279611299";
 
     const menuItems = {
         choc: { name: "Au chocolat shio pan set", price: 8.40, qty: 0 },
@@ -355,7 +345,6 @@
             }
         }
 
-        // Display adaptive screen constraints (Laptop vs Mobile layout)
         const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         if (isMobile) {
             document.getElementById('paymentInstructions').innerText = "Use the launcher link button to access Touch 'n Go, capture your checkout slip, and return back below to upload.";
@@ -370,7 +359,6 @@
         goToPage(3);
     }
 
-    // STRICT CHECK: Monitors file input and unlocks button only when valid file chosen
     function validateUpload() {
         const fileInput = document.getElementById('receiptFile');
         const completeBtn = document.getElementById('completeOrderBtn');
@@ -384,23 +372,18 @@
         }
     }
 
-    // THE FINAL TRIGGER POINT: Data lands in Google Sheets ONLY here!
     function finalizeOrderAndLockSheet() {
         if (!pendingOrderData) return;
 
-        // 1. PUSH THE RECORD DOWN TO GOOGLE SHEET PIPELINE
+        // SUBMITS TO SHEET EXCLUSIVELY AT THIS INTERSECTION STEP
         const sheetSubmissionURL = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse?submit=Submit&${NAME_ENTRY}=${encodeURIComponent(pendingOrderData.name)}&${PHONE_ENTRY}=${encodeURIComponent('+60' + pendingOrderData.phone)}&${EMAIL_ENTRY}=${encodeURIComponent(pendingOrderData.email)}&${BASKET_ENTRY}=${encodeURIComponent(pendingOrderData.basketString)}&${TOTAL_ENTRY}=${encodeURIComponent('$' + totalOrderPrice.toFixed(2))}&${METHOD_ENTRY}=${encodeURIComponent(pendingOrderData.deliveryMethod)}`;
         
         fetch(sheetSubmissionURL, { mode: 'no-cors' });
 
-        // 2. STAGE THE WHATSAPP MESSAGE LINK READY ON THE FINAL SCREEN BUTTON
-        const textMessage = `Hi Butter Town! I've placed my preorder and successfully verified payment:\n\n• Name: ${pendingOrderData.name}\n• Phone: +60${pendingOrderData.phone}\n• Basket: ${pendingOrderData.basketString}\n• Method: ${pendingOrderData.deliveryMethod}\n• Status: Paid ($${totalOrderPrice.toFixed(2)})\n\nSending over my attached transaction receipt slip now!`;
+        const textMessage = `Hi Butter Town! I've placed my preorder and verified payment:\n\n• Name: ${pendingOrderData.name}\n• Phone: +60${pendingOrderData.phone}\n• Basket: ${pendingOrderData.basketString}\n• Method: ${pendingOrderData.deliveryMethod}\n• Status: Paid ($${totalOrderPrice.toFixed(2)})\n\nSending over my attached transaction receipt slip now!`;
         document.getElementById('waFinalBtn').href = `https://wa.me/${MY_PHONE_NUMBER}?text=${encodeURIComponent(textMessage)}`;
 
-        // Clear local storage cache to protect double processing
         pendingOrderData = null;
-
-        // 3. LAUNCH CONFIRMATION SCREEN
         goToPage(4);
     }
 </script>
