@@ -3,147 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Butter Town - Shio Pan Preorder</title>
+    <title>Butter Town Preorder</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #faf7f2; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 500px; background: white; min-height: 75vh; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 25px; box-sizing: border-box; }
+        .app-container { width: 100%; max-width: 500px; background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .page { display: none; } .page.active { display: block; }
-        h1, h2 { color: #8b5a2b; margin-top: 0; }
+        h2 { color: #8b5a2b; margin-top: 0; }
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .menu-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; background: #fff; display: flex; flex-direction: column; justify-content: space-between; }
-        .item-title { font-weight: bold; margin-top: 8px; font-size: 0.95rem; min-height: 44px; }
-        .item-price { color: #666; font-size: 0.9rem; margin-top: 4px; font-weight: 600; }
-        .qty-stepper { display: flex; align-items: center; justify-content: space-between; border: 1px solid #cbd5e1; border-radius: 20px; padding: 4px 12px; width: 100px; margin: 12px auto 0 auto; }
-        .qty-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #333; }
-        .form-group { margin-bottom: 15px; } label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; color: #8b5a2b; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
-        .radio-option { border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; }
-        .btn { width: 100%; background: #8b5a2b; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn:disabled { opacity: 0.5; }
-        .qr-box { width: 180px; height: 180px; background: #eee; margin: 15px auto; display: flex; justify-content: center; align-items: center; border: 2px dashed #bbb; border-radius: 12px; }
-        .success-icon { font-size: 4rem; color: #4ade80; margin-bottom: 10px; text-align: center; }
+        .menu-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; text-align: center; }
+        .qty-stepper { display: flex; justify-content: center; align-items: center; gap: 15px; border: 1px solid #cbd5e1; border-radius: 20px; padding: 5px; margin-top: 10px; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-primary { background: #8b5a2b; color: white; }
+        .btn-secondary { background: #cbd5e1; color: #333; }
+        .btn-whatsapp { background: #25D366; color: white; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
+        .summary-box { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- STAGE 1: MENU -->
+    <!-- STAGE 1 -->
     <div id="page1" class="page active">
-        <h2>Shio Pan Sets</h2>
+        <h2>Adjust your desired quantity per bag package below.</h2>
         <div class="menu-grid" id="menu"></div>
-        <div style="text-align:right; margin-top:20px; font-weight:bold; font-size:1.1rem;">Total: <span id="p1-total">$0.00</span></div>
-        <button class="btn" onclick="goToPage(2)" id="nextBtn" disabled>Next: Checkout</button>
+        <p style="font-weight:bold; margin-top:20px;">Estimated Total: $<span id="p1-total">0.00</span></p>
+        <button class="btn btn-primary" id="nextBtn" disabled onclick="goToPage(2)">Next: Checkout Details</button>
     </div>
 
-    <!-- STAGE 2: DETAILS -->
+    <!-- STAGE 2 -->
     <div id="page2" class="page">
         <h2>Checkout Details</h2>
-        <form id="orderForm" onsubmit="handleFormSubmit(event)">
-            <div class="form-group"><label>Name *</label><input type="text" id="custName" required></div>
-            <div class="form-group"><label>WhatsApp *</label><input type="tel" id="custPhone" required></div>
-            <div class="form-group"><label>Email</label><input type="email" id="custEmail"></div>
-            <label>Collection Method *</label>
-            <div class="radio-option"><input type="radio" name="delivery" value="Mactaggart" checked> Mactaggart</div>
-            <div class="radio-option"><input type="radio" name="delivery" value="Holland Drive"> Holland Drive</div>
-            <button type="submit" class="btn">Proceed to Payment</button>
-        </form>
+        <label>Name *</label><input type="text" id="custName" placeholder="Your name">
+        <label>WhatsApp number *</label>
+        <div style="display:flex; gap:10px;"><input type="text" value="+60" style="width:60px;" readonly><input type="tel" id="custPhone"></div>
+        <label>Email</label><input type="email" id="custEmail" placeholder="Your email address">
+        <label>Your Basket Breakdown</label><div id="basketSummary" class="summary-box"></div>
+        <label>Delivery / Collection Method *</label>
+        <div style="border:1px solid #ddd; padding:10px; border-radius:8px;"><input type="radio" name="delivery" value="Mactaggart" checked> Self collection at Mactaggart</div>
+        <div style="border:1px solid #ddd; padding:10px; border-radius:8px; margin-top:5px;"><input type="radio" name="delivery" value="Holland Drive"> Self collection @ Holland Drive</div>
+        <p style="font-weight:bold;">Total Due $<span id="totalDue">0.00</span></p>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary" style="width:30%" onclick="goToPage(1)">Back</button>
+            <button class="btn btn-primary" style="width:70%" onclick="goToPage(3)">Proceed to Payment</button>
+        </div>
     </div>
 
-    <!-- STAGE 3: PAYMENT -->
+    <!-- STAGE 3 -->
     <div id="page3" class="page" style="text-align:center;">
         <h2>Scan & Pay</h2>
-        <div class="qr-box"><img src="tng-qr.png" alt="QR" style="width:100%"></div>
-        <input type="file" id="receiptFile" accept="image/*" required onchange="document.getElementById('completeOrderBtn').disabled=false">
-        <button id="completeOrderBtn" class="btn" disabled onclick="finalizeOrderAndLockSheet()">Verify & Complete</button>
+        <p>Scan the QR code below to finish payment, then upload your transaction slip picture.</p>
+        <!-- Random QR code placeholder -->
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ExamplePaymentData" alt="Payment QR" style="margin:20px 0; border:1px solid #eee; padding:10px;">
+        <p style="font-weight:bold;">Total Balance: $<span id="totalBalance">0.00</span></p>
+        <div class="summary-box" style="text-align:left;">
+            <label>Upload Payment Transaction Slip *</label>
+            <input type="file" id="receiptFile" onchange="document.getElementById('completeOrderBtn').disabled=false">
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary" style="width:30%" onclick="goToPage(2)">Back</button>
+            <button id="completeOrderBtn" class="btn btn-primary" disabled style="width:70%" onclick="finalizeOrder()">Verify & Complete Order</button>
+        </div>
     </div>
 
-    <!-- STAGE 4: CONFIRMATION -->
+    <!-- STAGE 4 -->
     <div id="page4" class="page" style="text-align:center;">
-        <div class="success-icon">✓</div>
+        <div style="font-size:4rem;">✓</div>
         <h2>Order Confirmed!</h2>
-        <p>Thank you! Your order is logged.</p>
-        <button class="btn" onclick="window.location.reload()">New Order</button>
+        <p>Thank you! Your preorder details have been securely logged into our system.</p>
+        <button class="btn btn-whatsapp" onclick="window.location.reload()">New Order</button>
     </div>
 </div>
 
 <script>
-    const GOOGLE_FORM_ID = "1FAIpQLSdFHPNDMeSIzx29M3g41t-7h8RQWsYr1unWqorwVT7NP-y6Hg"; 
-    const NAME_ENTRY   = "entry.752256232";
-    const PHONE_ENTRY  = "entry.1480684134";
-    const EMAIL_ENTRY  = "entry.1115728136";
-    const BASKET_ENTRY = "entry.2143900448";
-    const TOTAL_ENTRY  = "entry.1929353025";
-    const METHOD_ENTRY = "entry.2053930896";
+    const GOOGLE_FORM_ID = "1FAIpQLSdFHPNDMeSIzx29M3g41t-7h8RQWsYr1unWqorwVT7NP-y6Hg";
+    const NAME_ENTRY = "entry.752256232", PHONE_ENTRY = "entry.1480684134", EMAIL_ENTRY = "entry.1115728136", 
+          BASKET_ENTRY = "entry.2143900448", TOTAL_ENTRY = "entry.1929353025", METHOD_ENTRY = "entry.2053930896";
 
     const menuItems = { 
-        choc: { name: "Au chocolat", price: 8.40, emoji: "🍫" }, 
-        garlic: { name: "Garlic", price: 8.40, emoji: "🧄" },
-        bacon: { name: "Bacon", price: 9.00, emoji: "🥓" },
-        azuki: { name: "Azuki", price: 9.60, emoji: "🍡" }
+        choc: { name: "Au chocolat shio pan set", price: 8.40, img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=300&q=80" }, 
+        garlic: { name: "Garlic cheese shio pan set", price: 8.40, img: "https://images.unsplash.com/photo-1612203852033-a3d82054238e?w=300&q=80" }, 
+        bacon: { name: "Maple bacon shio pan set", price: 9.00, img: "https://images.unsplash.com/photo-1597642676774-8b6a374620f4?w=300&q=80" }, 
+        azuki: { name: "Azuki mochi shio pan set", price: 9.60, img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&q=80" } 
     };
     for (let k in menuItems) menuItems[k].qty = 0;
 
-    let totalOrderPrice = 0, pendingOrderData = null;
-
-    function changeQty(key, change) {
-        menuItems[key].qty = Math.max(0, menuItems[key].qty + change);
-        document.getElementById(`qty-${key}`).innerText = menuItems[key].qty;
-        calculateTotals();
-    }
-
-    function calculateTotals() {
-        totalOrderPrice = 0; let count = 0;
-        for (let k in menuItems) { totalOrderPrice += menuItems[k].qty * menuItems[k].price; count += menuItems[k].qty; }
-        document.getElementById('p1-total').innerText = `$${totalOrderPrice.toFixed(2)}`;
-        document.getElementById('nextBtn').disabled = (count === 0);
+    function changeQty(k, val) {
+        menuItems[k].qty = Math.max(0, menuItems[k].qty + val);
+        document.getElementById('qty-'+k).innerText = menuItems[k].qty;
+        let total = 0, summary = "";
+        for (let i in menuItems) {
+            total += menuItems[i].qty * menuItems[i].price;
+            if (menuItems[i].qty > 0) summary += "• " + menuItems[i].name + " x " + menuItems[i].qty + "<br>";
+        }
+        document.getElementById('p1-total').innerText = total.toFixed(2);
+        document.getElementById('totalDue').innerText = total.toFixed(2);
+        document.getElementById('totalBalance').innerText = total.toFixed(2);
+        document.getElementById('basketSummary').innerHTML = summary || "No items selected";
+        document.getElementById('nextBtn').disabled = total === 0;
     }
 
     function goToPage(p) {
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-        document.getElementById(`page${p}`).classList.add('active');
+        document.getElementById('page'+p).classList.add('active');
     }
 
-    function handleFormSubmit(e) {
-        e.preventDefault();
-        pendingOrderData = { 
-            name: document.getElementById('custName').value, 
-            phone: document.getElementById('custPhone').value, 
-            email: document.getElementById('custEmail').value, 
-            method: document.querySelector('input[name="delivery"]:checked').value 
-        };
-        goToPage(3);
-    }
-
-    function finalizeOrderAndLockSheet() {
-        const btn = document.getElementById('completeOrderBtn');
-        btn.innerText = "Saving...";
-        
-        let basket = "";
-        for (let k in menuItems) if (menuItems[k].qty > 0) basket += `${menuItems[k].name} x${menuItems[k].qty}; `;
-
+    function finalizeOrder() {
         const formData = new FormData();
-        formData.append(NAME_ENTRY, pendingOrderData.name);
-        formData.append(PHONE_ENTRY, pendingOrderData.phone);
-        formData.append(EMAIL_ENTRY, pendingOrderData.email);
-        formData.append(BASKET_ENTRY, basket);
-        formData.append(TOTAL_ENTRY, totalOrderPrice.toFixed(2));
-        formData.append(METHOD_ENTRY, pendingOrderData.method);
-
-        fetch(`https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse`, {
-            method: "POST", mode: "no-cors", body: formData
-        }).then(() => goToPage(4)).catch(() => alert("Error saving data."));
+        formData.append(NAME_ENTRY, document.getElementById('custName').value);
+        formData.append(PHONE_ENTRY, document.getElementById('custPhone').value);
+        formData.append(EMAIL_ENTRY, document.getElementById('custEmail').value);
+        formData.append(BASKET_ENTRY, document.getElementById('basketSummary').innerText.replace(/<br>/g, '; '));
+        formData.append(TOTAL_ENTRY, document.getElementById('totalDue').innerText);
+        formData.append(METHOD_ENTRY, document.querySelector('input[name="delivery"]:checked').value);
+        
+        fetch(`https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse`, { method: "POST", mode: "no-cors", body: formData })
+        .then(() => goToPage(4));
     }
 
     let menuHtml = "";
-    for(let k in menuItems) menuHtml += `<div class="menu-card">
-        <div style="font-size:1.5rem; text-align:center;">${menuItems[k].emoji}</div>
-        <div class="item-title">${menuItems[k].name}</div>
-        <div class="item-price">$${menuItems[k].price.toFixed(2)}</div>
-        <div class="qty-stepper">
-            <button class="qty-btn" onclick="changeQty('${k}',-1)">−</button>
-            <span id="qty-${k}">0</span>
-            <button class="qty-btn" onclick="changeQty('${k}',1)">+</button>
-        </div></div>`;
+    for(let k in menuItems) menuHtml += `
+        <div class="menu-card">
+            <img src="${menuItems[k].img}" style="width:100%; border-radius:8px; height:100px; object-fit:cover; margin-bottom:10px;">
+            <div style="font-size:0.85rem; font-weight:bold; height:35px; overflow:hidden;">${menuItems[k].name}</div>
+            <div style="color:#666; font-weight:600; margin-bottom:10px;">$${menuItems[k].price.toFixed(2)}</div>
+            <div class="qty-stepper">
+                <button onclick="changeQty('${k}',-1)" style="border:none; background:none; cursor:pointer;">−</button>
+                <span id="qty-${k}">0</span>
+                <button onclick="changeQty('${k}',1)" style="border:none; background:none; cursor:pointer;">+</button>
+            </div>
+        </div>`;
     document.getElementById('menu').innerHTML = menuHtml;
 </script>
 </body>
