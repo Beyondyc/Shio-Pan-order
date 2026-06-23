@@ -255,7 +255,7 @@
 <script>
     // LIVE CONFIGURATION FOR BUTTER TOWN DATA BRIDGE
     const MY_PHONE_NUMBER = "60123456789"; 
-    const GOOGLE_FORM_ID = "1mTkZ-MDoZ5-2EQTkqPDmgDxcrrHGfaYYvz8c34B3yX0";
+    const GOOGLE_FORM_ID = "1FAIpQLSdFHPNDMeSIzx29M3g41t-7h8RQWsYr1unWqorwVT7NP-y6Hg";
     
     // EXTRACTED STRUCTURAL CODES
     const NAME_ENTRY = "entry.2127267469";
@@ -363,8 +363,8 @@
     function finalizeOrderAndLockSheet() {
         if (!pendingOrderData) return;
 
-        // Construct the pre-filled public Google Form URL with proper standard view path
-        const prefilledURL = `https://docs.google.com/forms/d/${GOOGLE_FORM_ID}/viewform?usp=pp_url` +
+        // Structured live URL template string pointing straight to the public form framework
+        const prefilledURL = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/viewform?usp=pp_url` +
             `&${NAME_ENTRY}=${encodeURIComponent(pendingOrderData.name)}` +
             `&${PHONE_ENTRY}=${encodeURIComponent('+60' + pendingOrderData.phone)}` +
             `&${EMAIL_ENTRY}=${encodeURIComponent(pendingOrderData.email)}` +
@@ -372,7 +372,7 @@
             `&${TOTAL_ENTRY}=${encodeURIComponent('$' + totalOrderPrice.toFixed(2))}` +
             `&${METHOD_ENTRY}=${encodeURIComponent(pendingOrderData.deliveryMethod)}`;
 
-        // Force direct navigation in the same tab to stay bulletproof against popup blockers
+        // Route within the existing container window context to clear mobile restriction walls
         window.location.href = prefilledURL;
     }
 </script>
