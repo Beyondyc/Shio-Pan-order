@@ -111,7 +111,7 @@
         }
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
         
-        /* Success check animation wrapper */
+        /* Success Check Layout */
         .success-icon { font-size: 4rem; color: #4ade80; margin-bottom: 10px; }
     </style>
 </head>
@@ -119,7 +119,6 @@
 
 <div class="app-container">
     
-    <!-- PAGE 1: CHOOSE QUANTITIES -->
     <div id="page1" class="page active">
         <h2>Shio Pan Sets</h2>
         <p style="color:#666; font-size:0.9rem;">Adjust your desired quantity per bag package below.</p>
@@ -174,7 +173,6 @@
         <button class="btn btn-primary" onclick="goToPage(2)" id="nextBtn" disabled style="opacity:0.5;">Next: Checkout Details</button>
     </div>
 
-    <!-- PAGE 2: CHECKOUT DETAILS -->
     <div id="page2" class="page">
         <h2>Checkout Details</h2>
         
@@ -222,7 +220,6 @@
         </form>
     </div>
 
-    <!-- PAGE 3: PAYMENT & ATTACH RECEIPT -->
     <div id="page3" class="page" style="text-align:center;">
         <h2>Scan & Pay</h2>
         <p id="paymentInstructions">Processing payment methods...</p>
@@ -254,8 +251,7 @@
         </div>
     </div>
 
-    <!-- STAGE 5: SUCCESS PAGE -->
-    <div id="page5" class="page" style="text-align:center; padding:20px 0;">
+    <div id="page4" class="page" style="text-align:center; padding:20px 0;">
         <div class="success-icon">✓</div>
         <h2>Order Confirmed!</h2>
         <p style="color:#555; line-height:1.6; margin-bottom:25px;">
@@ -377,7 +373,6 @@
         completeBtn.disabled = true;
         completeBtn.innerText = "Saving Order...";
 
-        // Package data array for deployment to web app endpoint
         const payload = {
             name: pendingOrderData.name,
             phone: '+60' + pendingOrderData.phone,
@@ -387,22 +382,22 @@
             method: pendingOrderData.deliveryMethod
         };
 
-        // Send payload background request directly bypassing external forms
+        // Fire the background post request to the Google Sheets Web App link
         fetch(WEB_APP_URL, {
             method: "POST",
-            mode: "no-cors", // Bypasses browser CORS restrictions smoothly
+            mode: "no-cors",
             cache: "no-cache",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         })
         .then(() => {
-            // Update confirmation layout variables dynamically
+            // Populate the data inside Stage 4 (the confirmation layout)
             document.getElementById('successName').innerText = pendingOrderData.name;
             document.getElementById('successTotal').innerText = '$' + totalOrderPrice.toFixed(2);
             document.getElementById('successMethod').innerText = pendingOrderData.deliveryMethod;
             
-            // Advance straight to Stage 5 success framework
-            goToPage(5);
+            // Advance directly to Stage 4
+            goToPage(4);
         })
         .catch(err => {
             alert("Connection error trying to log your sheet row data. Please try again.");
