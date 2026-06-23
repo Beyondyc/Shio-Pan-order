@@ -104,11 +104,15 @@
         }
         .btn-primary { background: #8b5a2b; }
         .btn-primary:hover { background: #734922; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .qr-box {
             width: 180px; height: 180px; background: #eee; margin: 15px auto; display: flex; justify-content: center; align-items: center; border: 2px dashed #bbb; border-radius: 12px;
         }
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
+        
+        /* Success check animation wrapper */
+        .success-icon { font-size: 4rem; color: #4ade80; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -244,10 +248,25 @@
 
         <div style="display:flex; gap:10px;">
             <button type="button" class="btn" onclick="goToPage(2)" style="width:30%; background:#cbd5e1; color:#333; margin-top:10px;">Back</button>
-            <button id="completeOrderBtn" type="button" class="btn btn-primary" disabled style="opacity:0.5; margin-top:10px;" onclick="finalizeOrderAndLockSheet()">
+            <button id="completeOrderBtn" type="button" class="btn btn-primary" disabled style="margin-top:10px;" onclick="finalizeOrderAndLockSheet()">
                 Verify & Complete Order
             </button>
         </div>
+    </div>
+
+    <!-- STAGE 5: SUCCESS PAGE -->
+    <div id="page5" class="page" style="text-align:center; padding:20px 0;">
+        <div class="success-icon">✓</div>
+        <h2>Order Confirmed!</h2>
+        <p style="color:#555; line-height:1.6; margin-bottom:25px;">
+            Thank you for baking with us! Your order details have been securely saved and logged into our baking production schedule.
+        </p>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:15px; text-align:left; font-size:0.95rem;">
+            <p style="margin:4px 0;"><strong>Customer Name:</strong> <span id="successName"></span></p>
+            <p style="margin:4px 0;"><strong>Total Paid:</strong> <span id="successTotal"></span></p>
+            <p style="margin:4px 0;"><strong>Collection Point:</strong> <span id="successMethod"></span></p>
+        </div>
+        <button class="btn btn-primary" onclick="window.location.reload()" style="margin-top:30px;">Place Another Order</button>
     </div>
 
 </div>
@@ -255,15 +274,8 @@
 <script>
     // LIVE CONFIGURATION FOR BUTTER TOWN DATA BRIDGE
     const MY_PHONE_NUMBER = "60123456789"; 
-    const GOOGLE_FORM_ID = "1FAIpQLSdFHPNDMeSIzx29M3g41t-7h8RQWsYr1unWqorwVT7NP-y6Hg";
-    
-    // EXTRACTED STRUCTURAL CODES
-    const NAME_ENTRY = "entry.2127267469";
-    const PHONE_ENTRY = "entry.1706692298";
-    const EMAIL_ENTRY = "entry.722512966";
-    const BASKET_ENTRY = "entry.1983086154";
-    const TOTAL_ENTRY = "entry.1843513364";
-    const METHOD_ENTRY = "entry.1119565578";
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
+    const WEB_APP_URL = "YOUR_PASTED_WEB_APP_URL_HERE";
 
     const menuItems = {
         choc: { name: "Au chocolat shio pan set", price: 8.40, qty: 0 },
@@ -353,27 +365,51 @@
         
         if (fileInput.files && fileInput.files.length > 0) {
             completeBtn.disabled = false;
-            completeBtn.style.opacity = "1";
         } else {
             completeBtn.disabled = true;
-            completeBtn.style.opacity = "0.5";
         }
     }
 
     function finalizeOrderAndLockSheet() {
         if (!pendingOrderData) return;
 
-        // Structured live URL template string pointing straight to the public form framework
-        const prefilledURL = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/viewform?usp=pp_url` +
-            `&${NAME_ENTRY}=${encodeURIComponent(pendingOrderData.name)}` +
-            `&${PHONE_ENTRY}=${encodeURIComponent('+60' + pendingOrderData.phone)}` +
-            `&${EMAIL_ENTRY}=${encodeURIComponent(pendingOrderData.email)}` +
-            `&${BASKET_ENTRY}=${encodeURIComponent(pendingOrderData.basketString)}` +
-            `&${TOTAL_ENTRY}=${encodeURIComponent('$' + totalOrderPrice.toFixed(2))}` +
-            `&${METHOD_ENTRY}=${encodeURIComponent(pendingOrderData.deliveryMethod)}`;
+        const completeBtn = document.getElementById('completeOrderBtn');
+        completeBtn.disabled = true;
+        completeBtn.innerText = "Saving Order...";
 
-        // Route within the existing container window context to clear mobile restriction walls
-        window.location.href = prefilledURL;
+        // Package data array for deployment to web app endpoint
+        const payload = {
+            name: pendingOrderData.name,
+            phone: '+60' + pendingOrderData.phone,
+            email: pendingOrderData.email,
+            basket: pendingOrderData.basketString,
+            total: '$' + totalOrderPrice.toFixed(2),
+            method: pendingOrderData.deliveryMethod
+        };
+
+        // Send payload background request directly bypassing external forms
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors", // Bypasses browser CORS restrictions smoothly
+            cache: "no-cache",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            // Update confirmation layout variables dynamically
+            document.getElementById('successName').innerText = pendingOrderData.name;
+            document.getElementById('successTotal').innerText = '$' + totalOrderPrice.toFixed(2);
+            document.getElementById('successMethod').innerText = pendingOrderData.deliveryMethod;
+            
+            // Advance straight to Stage 5 success framework
+            goToPage(5);
+        })
+        .catch(err => {
+            alert("Connection error trying to log your sheet row data. Please try again.");
+            completeBtn.disabled = false;
+            completeBtn.innerText = "Verify & Complete Order";
+            console.error(err);
+        });
     }
 </script>
 
