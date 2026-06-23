@@ -16,7 +16,7 @@
         .btn-primary { background: #8b5a2b; color: white; }
         .btn-secondary { background: #cbd5e1; color: #333; }
         .btn-whatsapp { background: #25D366; color: white; }
-        input { width: 100%; padding: 10px; margin: 8px 0 2px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0 2px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
         .summary-box { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; }
         .error-msg { color: #dc2626; font-size: 0.75rem; margin-bottom: 10px; display: none; }
     </style>
@@ -26,16 +26,28 @@
 <div class="app-container">
     <!-- STAGE 1 -->
     <div id="page1" class="page active">
-        <h2>Adjust your desired quantity per bag package below.</h2>
+        <h2>Adjust your quantity below.</h2>
+        <p style="font-size: 0.9rem; color: #666;">Max 120 buns per day.</p>
+        <label>Select Collection Date *</label>
+        <select id="collectDate">
+            <option value="" disabled selected>-- Choose a date --</option>
+            <option value="27-Jun-2026">27 June 2026</option>
+            <option value="28-Jun-2026">28 June 2026</option>
+            <option value="29-Jun-2026">29 June 2026</option>
+            <option value="30-Jun-2026">30 June 2026</option>
+        </select>
+        <div id="errDate" class="error-msg">Please select a collection date.</div>
+        <div id="errLimit" class="error-msg">Order limit reached: Maximum 120 buns per day.</div>
+        
         <div class="menu-grid" id="menu"></div>
-        <p style="font-weight:bold; margin-top:20px;">Estimated Total: $<span id="p1-total">0.00</span></p>
-        <button class="btn btn-primary" id="nextBtn" disabled onclick="goToPage(2)">Next: Checkout Details</button>
+        <p style="font-weight:bold; margin-top:20px;">Total Buns: <span id="totalBuns">0</span>/120</p>
+        <p style="font-weight:bold;">Estimated Total: $<span id="p1-total">0.00</span></p>
+        <button class="btn btn-primary" id="nextBtn" disabled onclick="validateDateAndGo()">Next: Checkout Details</button>
     </div>
 
     <!-- STAGE 2 -->
     <div id="page2" class="page">
         <h2>Checkout Details</h2>
-        
         <label>Name *</label>
         <input type="text" id="custName" placeholder="Your name">
         <div id="errName" class="error-msg">Please enter your name.</div>
@@ -48,30 +60,31 @@
         <input type="email" id="custEmail" placeholder="Your email address">
         <div id="errEmail" class="error-msg">Please enter a valid email address.</div>
 
-        <label>Your Basket Breakdown</label><div id="basketSummary" class="summary-box"></div>
-        <label>Delivery / Collection Method *</label>
-        <div style="border:1px solid #ddd; padding:10px; border-radius:8px;"><input type="radio" name="delivery" value="Mactaggart" checked> Self collection at Mactaggart</div>
-        <div style="border:1px solid #ddd; padding:10px; border-radius:8px; margin-top:5px;"><input type="radio" name="delivery" value="Holland Drive"> Self collection @ Holland Drive</div>
+        <label>Your Basket</label>
+        <div id="basketSummary" class="summary-box"></div>
+        <label>Collection Method *</label>
+        <div style="border:1px solid #ddd; padding:10px; border-radius:8px;"><input type="radio" name="delivery" value="Mactaggart" checked> Mactaggart</div>
+        <div style="border:1px solid #ddd; padding:10px; border-radius:8px; margin-top:5px;"><input type="radio" name="delivery" value="Holland Drive"> Holland Drive</div>
         <p style="font-weight:bold;">Total Due $<span id="totalDue">0.00</span></p>
         <div style="display:flex; gap:10px;">
             <button class="btn btn-secondary" style="width:30%" onclick="goToPage(1)">Back</button>
-            <button class="btn btn-primary" style="width:70%" onclick="validateAndProceed()">Proceed to Payment</button>
+            <button class="btn btn-primary" style="width:70%" onclick="validateDetailsAndGo()">Proceed to Payment</button>
         </div>
     </div>
 
     <!-- STAGE 3 -->
     <div id="page3" class="page" style="text-align:center;">
         <h2>Payment: Touch 'n Go / DuitNow</h2>
-        <p>Scan the QR code below using your <strong>Touch 'n Go eWallet</strong> or any <strong>DuitNow</strong> banking app.</p>
+        <p>Scan the QR below via <strong>Touch 'n Go eWallet</strong> or any <strong>DuitNow</strong> bank app.</p>
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ExamplePaymentData" alt="Payment QR" style="margin:20px 0; border:1px solid #eee; padding:10px;">
-        <p style="font-weight:bold;">Total Balance: $<span id="totalBalance">0.00</span></p>
+        <p style="font-weight:bold;">Total: $<span id="totalBalance">0.00</span></p>
         <div class="summary-box" style="text-align:left;">
-            <label>Upload Payment Transaction Slip *</label>
+            <label>Upload Transaction Slip *</label>
             <input type="file" id="receiptFile" onchange="document.getElementById('completeOrderBtn').disabled=false">
         </div>
         <div style="display:flex; gap:10px;">
             <button class="btn btn-secondary" style="width:30%" onclick="goToPage(2)">Back</button>
-            <button id="completeOrderBtn" class="btn btn-primary" disabled style="width:70%" onclick="finalizeOrder()">Verify & Complete Order</button>
+            <button id="completeOrderBtn" class="btn disabled" disabled style="width:70%" onclick="finalizeOrder()">Verify & Complete</button>
         </div>
     </div>
 
@@ -79,15 +92,16 @@
     <div id="page4" class="page" style="text-align:center;">
         <div style="font-size:4rem;">✓</div>
         <h2>Order Confirmed!</h2>
-        <p>Thank you! Your preorder details have been securely logged.</p>
-        <button class="btn btn-whatsapp" onclick="window.location.reload()">New Order</button>
+        <p>Please click below to send your payment slip to us on WhatsApp.</p>
+        <button class="btn btn-whatsapp" onclick="sendWhatsApp()">📱 Send Slip on WhatsApp</button>
+        <button class="btn btn-secondary" onclick="window.location.reload()">Start New Order</button>
     </div>
 </div>
 
 <script>
     const GOOGLE_FORM_ID = "1FAIpQLSdFHPNDMeSIzx29M3g41t-7h8RQWsYr1unWqorwVT7NP-y6Hg";
-    const NAME_ENTRY = "entry.752256232", PHONE_ENTRY = "entry.1480684134", EMAIL_ENTRY = "entry.1115728136", 
-          BASKET_ENTRY = "entry.2143900448", TOTAL_ENTRY = "entry.1929353025", METHOD_ENTRY = "entry.2053930896";
+    const NAME_ENTRY = "entry.752256232", PHONE_ENTRY = "entry.1480684134", DATE_ENTRY = "entry.1983218714", 
+          EMAIL_ENTRY = "entry.1115728136", BASKET_ENTRY = "entry.2143900448", TOTAL_ENTRY = "entry.1929353025", METHOD_ENTRY = "entry.2053930896";
 
     const menuItems = { 
         choc: { name: "Au chocolat shio pan set", price: 8.40, img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=300&q=80" }, 
@@ -98,13 +112,26 @@
     for (let k in menuItems) menuItems[k].qty = 0;
 
     function changeQty(k, val) {
+        let currentTotal = 0;
+        for (let i in menuItems) currentTotal += menuItems[i].qty;
+
+        if (val > 0 && currentTotal >= 120) {
+            document.getElementById('errLimit').style.display = 'block';
+            return;
+        }
+
         menuItems[k].qty = Math.max(0, menuItems[k].qty + val);
         document.getElementById('qty-'+k).innerText = menuItems[k].qty;
-        let total = 0, summary = "";
+        
+        let total = 0, totalBuns = 0, summary = "";
         for (let i in menuItems) {
             total += menuItems[i].qty * menuItems[i].price;
+            totalBuns += menuItems[i].qty;
             if (menuItems[i].qty > 0) summary += "• " + menuItems[i].name + " x " + menuItems[i].qty + "<br>";
         }
+        
+        document.getElementById('errLimit').style.display = 'none';
+        document.getElementById('totalBuns').innerText = totalBuns;
         document.getElementById('p1-total').innerText = total.toFixed(2);
         document.getElementById('totalDue').innerText = total.toFixed(2);
         document.getElementById('totalBalance').innerText = total.toFixed(2);
@@ -118,18 +145,19 @@
         document.querySelectorAll('.error-msg').forEach(el => el.style.display = 'none');
     }
 
-    function validateAndProceed() {
-        const fields = [
-            { id: 'custName', err: 'errName' },
-            { id: 'custPhone', err: 'errPhone' },
-            { id: 'custEmail', err: 'errEmail' }
-        ];
+    function validateDateAndGo() {
+        if (!document.getElementById('collectDate').value) {
+            document.getElementById('errDate').style.display = 'block';
+        } else { goToPage(2); }
+    }
+
+    function validateDetailsAndGo() {
+        const fields = [{ id: 'custName', err: 'errName' }, { id: 'custPhone', err: 'errPhone' }, { id: 'custEmail', err: 'errEmail' }];
         let isValid = true;
         fields.forEach(f => {
             const el = document.getElementById(f.id);
-            const err = document.getElementById(f.err);
-            if (!el.value.trim()) { err.style.display = 'block'; isValid = false; }
-            else { err.style.display = 'none'; }
+            if (!el.value.trim()) { document.getElementById(f.err).style.display = 'block'; isValid = false; }
+            else { document.getElementById(f.err).style.display = 'none'; }
         });
         if (isValid) goToPage(3);
     }
@@ -139,12 +167,20 @@
         formData.append(NAME_ENTRY, document.getElementById('custName').value);
         formData.append(PHONE_ENTRY, document.getElementById('custPhone').value);
         formData.append(EMAIL_ENTRY, document.getElementById('custEmail').value);
+        formData.append(DATE_ENTRY, document.getElementById('collectDate').value);
         formData.append(BASKET_ENTRY, document.getElementById('basketSummary').innerText.replace(/•/g, '').trim());
         formData.append(TOTAL_ENTRY, document.getElementById('totalDue').innerText);
         formData.append(METHOD_ENTRY, document.querySelector('input[name="delivery"]:checked').value);
         
         fetch(`https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse`, { method: "POST", mode: "no-cors", body: formData })
         .then(() => goToPage(4));
+    }
+
+    function sendWhatsApp() {
+        const name = document.getElementById('custName').value;
+        const total = document.getElementById('totalDue').innerText;
+        const msg = `Hi! My name is ${name}. I have made a payment of $${total}. Attached is my transaction slip for my order.`;
+        window.open(`https://wa.me/60123456789?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     let menuHtml = "";
