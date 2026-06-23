@@ -16,8 +16,9 @@
         .btn-primary { background: #8b5a2b; color: white; }
         .btn-secondary { background: #cbd5e1; color: #333; }
         .btn-whatsapp { background: #25D366; color: white; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
+        input { width: 100%; padding: 10px; margin: 8px 0 2px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
         .summary-box { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; }
+        .error-msg { color: #dc2626; font-size: 0.75rem; margin-bottom: 10px; display: none; }
     </style>
 </head>
 <body>
@@ -34,10 +35,19 @@
     <!-- STAGE 2 -->
     <div id="page2" class="page">
         <h2>Checkout Details</h2>
-        <label>Name *</label><input type="text" id="custName" placeholder="Your name">
+        
+        <label>Name *</label>
+        <input type="text" id="custName" placeholder="Your name">
+        <div id="errName" class="error-msg">Please enter your name.</div>
+
         <label>WhatsApp number *</label>
-        <div style="display:flex; gap:10px;"><input type="text" value="+60" style="width:60px;" readonly><input type="tel" id="custPhone"></div>
-        <label>Email</label><input type="email" id="custEmail" placeholder="Your email address">
+        <div style="display:flex; gap:10px;"><input type="text" value="+60" style="width:60px;" readonly><input type="tel" id="custPhone" placeholder="e.g. 123456789"></div>
+        <div id="errPhone" class="error-msg">Please enter your WhatsApp number.</div>
+
+        <label>Email *</label>
+        <input type="email" id="custEmail" placeholder="Your email address">
+        <div id="errEmail" class="error-msg">Please enter a valid email address.</div>
+
         <label>Your Basket Breakdown</label><div id="basketSummary" class="summary-box"></div>
         <label>Delivery / Collection Method *</label>
         <div style="border:1px solid #ddd; padding:10px; border-radius:8px;"><input type="radio" name="delivery" value="Mactaggart" checked> Self collection at Mactaggart</div>
@@ -45,15 +55,14 @@
         <p style="font-weight:bold;">Total Due $<span id="totalDue">0.00</span></p>
         <div style="display:flex; gap:10px;">
             <button class="btn btn-secondary" style="width:30%" onclick="goToPage(1)">Back</button>
-            <button class="btn btn-primary" style="width:70%" onclick="goToPage(3)">Proceed to Payment</button>
+            <button class="btn btn-primary" style="width:70%" onclick="validateAndProceed()">Proceed to Payment</button>
         </div>
     </div>
 
     <!-- STAGE 3 -->
     <div id="page3" class="page" style="text-align:center;">
-        <h2>Scan & Pay</h2>
-        <p>Scan the QR code below to finish payment, then upload your transaction slip picture.</p>
-        <!-- Random QR code placeholder -->
+        <h2>Payment: Touch 'n Go / DuitNow</h2>
+        <p>Scan the QR code below using your <strong>Touch 'n Go eWallet</strong> or any <strong>DuitNow</strong> banking app.</p>
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ExamplePaymentData" alt="Payment QR" style="margin:20px 0; border:1px solid #eee; padding:10px;">
         <p style="font-weight:bold;">Total Balance: $<span id="totalBalance">0.00</span></p>
         <div class="summary-box" style="text-align:left;">
@@ -70,7 +79,7 @@
     <div id="page4" class="page" style="text-align:center;">
         <div style="font-size:4rem;">✓</div>
         <h2>Order Confirmed!</h2>
-        <p>Thank you! Your preorder details have been securely logged into our system.</p>
+        <p>Thank you! Your preorder details have been securely logged.</p>
         <button class="btn btn-whatsapp" onclick="window.location.reload()">New Order</button>
     </div>
 </div>
@@ -106,6 +115,23 @@
     function goToPage(p) {
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
         document.getElementById('page'+p).classList.add('active');
+        document.querySelectorAll('.error-msg').forEach(el => el.style.display = 'none');
+    }
+
+    function validateAndProceed() {
+        const fields = [
+            { id: 'custName', err: 'errName' },
+            { id: 'custPhone', err: 'errPhone' },
+            { id: 'custEmail', err: 'errEmail' }
+        ];
+        let isValid = true;
+        fields.forEach(f => {
+            const el = document.getElementById(f.id);
+            const err = document.getElementById(f.err);
+            if (!el.value.trim()) { err.style.display = 'block'; isValid = false; }
+            else { err.style.display = 'none'; }
+        });
+        if (isValid) goToPage(3);
     }
 
     function finalizeOrder() {
@@ -113,7 +139,7 @@
         formData.append(NAME_ENTRY, document.getElementById('custName').value);
         formData.append(PHONE_ENTRY, document.getElementById('custPhone').value);
         formData.append(EMAIL_ENTRY, document.getElementById('custEmail').value);
-        formData.append(BASKET_ENTRY, document.getElementById('basketSummary').innerText.replace(/<br>/g, '; '));
+        formData.append(BASKET_ENTRY, document.getElementById('basketSummary').innerText.replace(/•/g, '').trim());
         formData.append(TOTAL_ENTRY, document.getElementById('totalDue').innerText);
         formData.append(METHOD_ENTRY, document.querySelector('input[name="delivery"]:checked').value);
         
@@ -128,9 +154,9 @@
             <div style="font-size:0.85rem; font-weight:bold; height:35px; overflow:hidden;">${menuItems[k].name}</div>
             <div style="color:#666; font-weight:600; margin-bottom:10px;">$${menuItems[k].price.toFixed(2)}</div>
             <div class="qty-stepper">
-                <button onclick="changeQty('${k}',-1)" style="border:none; background:none; cursor:pointer;">−</button>
+                <button type="button" onclick="changeQty('${k}',-1)" style="border:none; background:none; cursor:pointer;">−</button>
                 <span id="qty-${k}">0</span>
-                <button onclick="changeQty('${k}',1)" style="border:none; background:none; cursor:pointer;">+</button>
+                <button type="button" onclick="changeQty('${k}',1)" style="border:none; background:none; cursor:pointer;">+</button>
             </div>
         </div>`;
     document.getElementById('menu').innerHTML = menuHtml;
