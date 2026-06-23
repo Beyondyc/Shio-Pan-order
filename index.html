@@ -255,7 +255,7 @@
 <script>
     // LIVE CONFIGURATION FOR BUTTER TOWN DATA BRIDGE
     const MY_PHONE_NUMBER = "60123456789"; 
-    const GOOGLE_FORM_ID = "1FAIpQLSdFHPNDMeSIzx29M3g41t-7h8RQWsYr1unWqorwVT7NP-y6Hg";
+    const GOOGLE_FORM_ID = "1mTkZ-MDoZ5-2EQTkqPDmgDxcrrHGfaYYvz8c34B3yX0";
     
     // EXTRACTED STRUCTURAL CODES
     const NAME_ENTRY = "entry.2127267469";
@@ -363,8 +363,8 @@
     function finalizeOrderAndLockSheet() {
         if (!pendingOrderData) return;
 
-        // Construct the pre-filled public Google Form URL
-        const prefilledURL = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/viewform?usp=pp_url` +
+        // Construct the pre-filled public Google Form URL with proper standard view path
+        const prefilledURL = `https://docs.google.com/forms/d/${GOOGLE_FORM_ID}/viewform?usp=pp_url` +
             `&${NAME_ENTRY}=${encodeURIComponent(pendingOrderData.name)}` +
             `&${PHONE_ENTRY}=${encodeURIComponent('+60' + pendingOrderData.phone)}` +
             `&${EMAIL_ENTRY}=${encodeURIComponent(pendingOrderData.email)}` +
