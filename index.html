@@ -118,6 +118,7 @@
 
 <div class="app-container">
     
+    <!-- PAGE 1: CHOOSE QUANTITIES -->
     <div id="page1" class="page active">
         <h2>Shio Pan Sets</h2>
         <p style="color:#666; font-size:0.9rem;">Adjust your desired quantity per bag package below.</p>
@@ -172,6 +173,7 @@
         <button class="btn btn-primary" onclick="goToPage(2)" id="nextBtn" disabled style="opacity:0.5;">Next: Checkout Details</button>
     </div>
 
+    <!-- PAGE 2: CHECKOUT DETAILS -->
     <div id="page2" class="page">
         <h2>Checkout Details</h2>
         
@@ -219,6 +221,7 @@
         </form>
     </div>
 
+    <!-- PAGE 3: PAYMENT & ATTACH RECEIPT (STRICT GATE) -->
     <div id="page3" class="page" style="text-align:center;">
         <h2>Scan & Pay</h2>
         <p id="paymentInstructions">Processing payment methods...</p>
@@ -250,6 +253,7 @@
         </div>
     </div>
 
+    <!-- PAGE 4: CONFIRMED SCREEN -->
     <div id="page4" class="page" style="text-align:center; padding:20px 0;">
         <div class="success-badge">✓</div>
         <h2>Order Confirmed!</h2>
@@ -270,7 +274,7 @@
     const MY_PHONE_NUMBER = "60123456789"; 
     const GOOGLE_FORM_ID = "1FAIpQLSdFHPNDMeSIzx29M3g41t-7h8RQWsYr1unWqorwVT7NP-y6Hg";
     
-    // VERIFIED AND EXTRACTED ENTRY TAGS
+    // EXTRACTED STRUCTURAL CODES
     const NAME_ENTRY = "entry.2127267469";
     const PHONE_ENTRY = "entry.1706692298";
     const EMAIL_ENTRY = "entry.722512966";
@@ -376,13 +380,49 @@
     function finalizeOrderAndLockSheet() {
         if (!pendingOrderData) return;
 
-        // Pushes data to Google Form Endpoint
-        const sheetSubmissionURL = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse?submit=Submit&${NAME_ENTRY}=${encodeURIComponent(pendingOrderData.name)}&${PHONE_ENTRY}=${encodeURIComponent('+60' + pendingOrderData.phone)}&${EMAIL_ENTRY}=${encodeURIComponent(pendingOrderData.email)}&${BASKET_ENTRY}=${encodeURIComponent(pendingOrderData.basketString)}&${TOTAL_ENTRY}=${encodeURIComponent('$' + totalOrderPrice.toFixed(2))}&${METHOD_ENTRY}=${encodeURIComponent(pendingOrderData.deliveryMethod)}`;
-        
-        fetch(sheetSubmissionURL, { mode: 'no-cors' })
-            .then(() => { console.log("Transmission sequence complete."); })
-            .catch((err) => { console.error("Error logging submission:", err); });
+        // 1. Create a hidden background iframe to avoid security blocks
+        let hiddenFrame = document.createElement('iframe');
+        hiddenFrame.name = 'hidden_iframe_bridge';
+        hiddenFrame.id = 'hidden_iframe_bridge';
+        hiddenFrame.style.display = 'none';
+        document.body.appendChild(hiddenFrame);
 
+        // 2. Build temporary invisible form submission elements
+        let targetForm = document.createElement('form');
+        targetForm.action = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse`;
+        targetForm.method = 'POST';
+        targetForm.target = 'hidden_iframe_bridge'; 
+
+        // 3. Match the data blocks to your exact entry variables
+        const fields = {
+            [NAME_ENTRY]: pendingOrderData.name,
+            [PHONE_ENTRY]: '+60' + pendingOrderData.phone,
+            [EMAIL_ENTRY]: pendingOrderData.email,
+            [BASKET_ENTRY]: pendingOrderData.basketString,
+            [TOTAL_ENTRY]: '$' + totalOrderPrice.toFixed(2),
+            [METHOD_ENTRY]: pendingOrderData.deliveryMethod
+        };
+
+        // 4. Inject inputs into the submission element form
+        for (const key in fields) {
+            let input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = fields[key];
+            targetForm.appendChild(input);
+        }
+
+        // 5. Submit transmission packet seamlessly
+        document.body.appendChild(targetForm);
+        targetForm.submit();
+        
+        // Cleanup document workspace
+        setTimeout(() => {
+            targetForm.remove();
+            hiddenFrame.remove();
+        }, 500);
+
+        // 6. Build and route the text string over to WhatsApp API
         const textMessage = `Hi Butter Town! I've placed my preorder and verified payment:\n\n• Name: ${pendingOrderData.name}\n• Phone: +60${pendingOrderData.phone}\n• Basket: ${pendingOrderData.basketString}\n• Method: ${pendingOrderData.deliveryMethod}\n• Status: Paid ($${totalOrderPrice.toFixed(2)})\n\nSending over my attached transaction receipt slip now!`;
         document.getElementById('waFinalBtn').href = `https://wa.me/${MY_PHONE_NUMBER}?text=${encodeURIComponent(textMessage)}`;
 
