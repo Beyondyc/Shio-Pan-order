@@ -48,7 +48,7 @@
         .item-title { font-weight: bold; margin-top: 8px; font-size: 0.95rem; min-height: 44px; }
         .item-price { color: #666; font-size: 0.9rem; margin-top: 4px; font-weight: 600; }
 
-        /* Quantity Selector Styles matching image_d48786.png */
+        /* Quantity Selector Styles */
         .qty-stepper {
             display: flex;
             align-items: center;
@@ -268,14 +268,15 @@
 <script>
     // LIVE CONFIGURATION FOR BUTTER TOWN DATA BRIDGE
     const MY_PHONE_NUMBER = "60123456789"; 
-    const GOOGLE_FORM_ID = "1mTkZ-MDoZ5-2EQTkqPDmgDxcrrHGfaYYvz8c34B3yX0";
+    const GOOGLE_FORM_ID = "1FAIpQLSdFHPNDMeSIzx29M3g41t-7h8RQWsYr1unWqorwVT7NP-y6Hg";
     
-    const NAME_ENTRY = "entry.311357675";
-    const PHONE_ENTRY = "entry.607421381";
-    const EMAIL_ENTRY = "entry.1691288301";
-    const BASKET_ENTRY = "entry.1030064716";
-    const TOTAL_ENTRY = "entry.835471922";
-    const METHOD_ENTRY = "entry.279611299";
+    // VERIFIED AND EXTRACTED ENTRY TAGS
+    const NAME_ENTRY = "entry.2127267469";
+    const PHONE_ENTRY = "entry.1706692298";
+    const EMAIL_ENTRY = "entry.722512966";
+    const BASKET_ENTRY = "entry.1983086154";
+    const TOTAL_ENTRY = "entry.1843513364";
+    const METHOD_ENTRY = "entry.1119565578";
 
     const menuItems = {
         choc: { name: "Au chocolat shio pan set", price: 8.40, qty: 0 },
@@ -375,10 +376,12 @@
     function finalizeOrderAndLockSheet() {
         if (!pendingOrderData) return;
 
-        // SUBMITS TO SHEET EXCLUSIVELY AT THIS INTERSECTION STEP
+        // Pushes data to Google Form Endpoint
         const sheetSubmissionURL = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse?submit=Submit&${NAME_ENTRY}=${encodeURIComponent(pendingOrderData.name)}&${PHONE_ENTRY}=${encodeURIComponent('+60' + pendingOrderData.phone)}&${EMAIL_ENTRY}=${encodeURIComponent(pendingOrderData.email)}&${BASKET_ENTRY}=${encodeURIComponent(pendingOrderData.basketString)}&${TOTAL_ENTRY}=${encodeURIComponent('$' + totalOrderPrice.toFixed(2))}&${METHOD_ENTRY}=${encodeURIComponent(pendingOrderData.deliveryMethod)}`;
         
-        fetch(sheetSubmissionURL, { mode: 'no-cors' });
+        fetch(sheetSubmissionURL, { mode: 'no-cors' })
+            .then(() => { console.log("Transmission sequence complete."); })
+            .catch((err) => { console.error("Error logging submission:", err); });
 
         const textMessage = `Hi Butter Town! I've placed my preorder and verified payment:\n\n• Name: ${pendingOrderData.name}\n• Phone: +60${pendingOrderData.phone}\n• Basket: ${pendingOrderData.basketString}\n• Method: ${pendingOrderData.deliveryMethod}\n• Status: Paid ($${totalOrderPrice.toFixed(2)})\n\nSending over my attached transaction receipt slip now!`;
         document.getElementById('waFinalBtn').href = `https://wa.me/${MY_PHONE_NUMBER}?text=${encodeURIComponent(textMessage)}`;
